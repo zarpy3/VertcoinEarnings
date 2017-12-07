@@ -290,7 +290,7 @@ config = 'config.txt'
 configOpen = open(config)
 configFile = configOpen.read()
 configRegex = str(re.findall(r'\"replace this text between the quotes\"', configFile))
-if configRegex == '[\'\"replace this text between the quotes\"\']':
+if configRegex == '[\'\"replace this text between the quotes\"\', \'\"replace this text between the quotes\"\']':
     print('Please enter the following information:')
     print('')
     config = 0
