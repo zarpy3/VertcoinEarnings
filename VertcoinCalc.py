@@ -4,18 +4,36 @@ import time
 from coinmarketcap import Market
 import re
 
+def currencyChoice():
+    print('Please choose from the following options for your currency:')
+    print('')
+    print('1. GBP')
+    print('2. USD')
+    print('')
+    global payoutCur
+    payoutCur = int(input('Please choose your currency: '))
+
 coinmarketcap = Market()
-vtcGBPJ = coinmarketcap.ticker('vertcoin', convert='GBP')
-#print(vtcGBPJ)
-svtcGBPJ = str(vtcGBPJ)
-priceGBPPartMatch = str(re.findall(r'\'price_gbp\'\: \'[0-9]{1,}\.[0-9]{1,}', svtcGBPJ))
-priceGBP = str(re.findall(r'[0-9]{1,}\.[0-9]{1,}', priceGBPPartMatch))
-intPriceGBP = priceGBP.replace("[", "")
-intPriceGBP = intPriceGBP.replace("'", "")
-floatPriceGBP = float(intPriceGBP.replace("]", ""))
+vtcJ = coinmarketcap.ticker('vertcoin', convert='GBP')
+svtcJ = str(vtcJ)
 
+#Almost definitely not the most efficient way of doing it but it works
 
+def gbpCur():
+    priceGBPPartMatch = str(re.findall(r'\'price_gbp\'\: \'[0-9]{1,}\.[0-9]{1,}', svtcJ))
+    priceGBP = str(re.findall(r'[0-9]{1,}\.[0-9]{1,}', priceGBPPartMatch))
+    intPriceGBP = priceGBP.replace("[", "")
+    intPriceGBP = intPriceGBP.replace("'", "")
+    global floatPriceGBP
+    floatPriceGBP = float(intPriceGBP.replace("]", ""))
 
+def usdCur():
+    priceUSDPartMatch = str(re.findall(r'\'price_usd\'\: \'[0-9]{1,}\.[0-9]{1,}', svtcJ))
+    priceUSD = str(re.findall(r'[0-9]{1,}\.[0-9]{1,}', priceUSDPartMatch))
+    intPriceUSD = priceUSD.replace("[", "")
+    intPriceUSD = intPriceUSD.replace("'", "")
+    global floatPriceUSD
+    floatPriceUSD = float(intPriceUSD.replace("]", ""))
 
 print('''
                                     :::::
@@ -83,6 +101,19 @@ print('')
 
 payout = BV * (EH/GH*(1-(NF-DF)))
 
-VTC = floatPriceGBP * payout
+currencyChoice()
 
-print('Your estimated payout is: ' + str(round(payout,6)) + ' VTC. Which is £' + str(round(VTC,4)))
+if payoutCur == 1:
+    gbpCur()
+    VTC = floatPriceGBP * payout
+    sign = '£'
+elif payoutCur == 2:
+    usdCur()
+    VTC = floatPriceUSD * payout
+    sign = '$'
+else:
+    print('')
+    print('Please choose a valid option.')
+    currencyChoice()
+
+print('Your estimated payout is: ' + str(round(payout,6)) + ' VTC. Which is '+ sign + str(round(VTC,4)))
