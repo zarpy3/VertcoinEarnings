@@ -12,6 +12,16 @@ def currencyChoice():
     print('')
     global payoutCur
     payoutCur = int(input('Please choose your currency: '))
+    print('')
+
+def rejectedHashUnits():
+    print('Please choose from the following options for rejected hashrate:')
+    print('1. MH/s')
+    print('2. KH/s')
+    print('')
+    global rejectUnits
+    rejectUnits = int(input('Please choose your units: '))
+    print('')
 
 coinmarketcap = Market()
 vtcJ = coinmarketcap.ticker('vertcoin', convert='GBP')
@@ -34,6 +44,14 @@ def usdCur():
     intPriceUSD = intPriceUSD.replace("'", "")
     global floatPriceUSD
     floatPriceUSD = float(intPriceUSD.replace("]", ""))
+
+def btcCur():
+    priceBTCPartMatch = str(re.findall(r'\'price_btc\'\: \'[0-9]{1,}\.[0-9]{1,}', svtcJ))
+    priceBTC = str(re.findall(r'[0-9]{1,}\.[0-9]{1,}', priceBTCPartMatch))
+    intPriceBTC = priceBTC.replace("[", "")
+    intPriceBTC = intPriceBTC.replace("'", "")
+    global floatPriceBTC
+    floatPriceBTC = float(intPriceBTC.replace("]", ""))
 
 print('''
                                     :::::
@@ -66,19 +84,22 @@ hashrate = float(input('Please enter your hashrate (MH/s): '))
 H = hashrate
 print('')
 
-print('Please choose from the following options for rejected hashrate:')
-print('1. MH/s')
-print('2. KH/s')
-print('')
-rejectUnits = int(input('Please choose your units: '))
-print('')
+rejectedHashUnits()
 
 rejectedHashrate = float(input('Please enter your rejected hashrate: '))
 print('')
+
 if rejectUnits == 1:
     RH = rejectedHashrate
 elif rejectUnits == 2:
     RH = rejectedHashrate / 1000
+else:
+    print('')
+    print('Please enter a valid option.')
+    print('')
+    rejectedHashUnits()
+
+
 
 effectiveHashrate = H - RH
 EH = effectiveHashrate
@@ -105,15 +126,20 @@ currencyChoice()
 
 if payoutCur == 1:
     gbpCur()
+    btcCur()
     VTC = floatPriceGBP * payout
     sign = '£'
+    BTC = floatPriceBTC * payout
 elif payoutCur == 2:
     usdCur()
+    btcCur()
     VTC = floatPriceUSD * payout
     sign = '$'
+    BTC = floatPriceBTC * payout
 else:
     print('')
     print('Please choose a valid option.')
+    print('')
     currencyChoice()
 
-print('Your estimated payout is: ' + str(round(payout,6)) + ' VTC. Which is '+ sign + str(round(VTC,4)))
+print('Your estimated payout is: ' + str(round(payout,6)) + ' VTC / ' + str(BTC) + ' BTC / ' + sign + str(round(VTC,4)))
