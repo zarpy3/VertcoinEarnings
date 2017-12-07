@@ -201,13 +201,21 @@ def manual():
 
     print('Your estimated payout is: ' + str(round(payout,6)) + ' VTC / ' + str(BTC) + ' BTC / ' + sign + str(round(VTC,4)))
 
+def dataInput():
+    if config == 0:
+        global p2pool
+        p2pool = input('Please input the p2pool\'s address: ')
+        p2pool = p2pool.replace('/static/', '')
+        global vertcoinWallet
+        vertcoinWallet = input('Please input your vertcoin wallet address: ')
+        print('')
+    else:
+        p2pool = p2pool
+        p2pool = p2pool.replace('/static/', '')
+        vertcoinWallet = vertcoinWallet
+
 def automatic():
-    global p2pool
-    p2pool = input('Please input the p2pool\'s address: ')
-    p2pool = p2pool.replace('/static/', '')
-    global vertcoinWallet
-    vertcoinWallet = input('Please input your vertcoin wallet address: ')
-    print('')
+    dataInput()
     myHashrate()
     print('Your hashrate is ' + str(myHashrate) + ' MH/s.')
     myRejectedHashrate()
@@ -277,16 +285,45 @@ print('''
 
 ''')
 print('Hello, Welcome to the VertCoin profit calculator.')
-print('Please enter the following information:')
-print('')
 
-startOption()
-
-if link == 1:
-    automatic()
-elif link == 2:
-    manual()
-else:
-    print('Please choose a valid option.')
+config = 'config.txt'
+configOpen = open(config)
+configFile = configOpen.read()
+configRegex = str(re.findall(r'\"replace this text between the quotes\"', configFile))
+if configRegex == '[\'\"replace this text between the quotes\"\']':
+    print('Please enter the following information:')
     print('')
+    config = 0
     startOption()
+
+    if link == 1:
+        automatic()
+    elif link == 2:
+        manual()
+    else:
+        print('Please choose a valid option.')
+        print('')
+        startOption()
+else:
+    print('Do you want to load from config.txt?:')
+    configQuestion = int(input('Enter 1 to load from config.txt, enter 2 for more options: '))
+    print('')
+    if configQuestion == 1:
+        config = 1
+        p2poolRegex = str(re.findall(r'p2pool: \"http://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]{1,}/static[/]{0,}', configFile))
+        p2poolRegex = p2poolRegex.replace('[', '')
+        p2poolRegex = p2poolRegex.replace(']', '')
+        p2poolRegex = p2poolRegex.replace("'", '')
+        p2poolRegex = p2poolRegex.replace('"', '')
+        p2pool = p2poolRegex.replace('p2pool: ', '')
+
+        walletRegex = str(re.findall(r'wallet: \"[0-9A-Za-z]{1,}\"', configFile))
+        walletRegex = walletRegex.replace('[', '')
+        walletRegex = walletRegex.replace(']', '')
+        walletRegex = walletRegex.replace("'", '')
+        walletRegex = walletRegex.replace('"', '')
+        vertcoinWallet = walletRegex.replace('wallet: ', '')
+        automatic()
+    else:
+        config = 0
+        automatic()
