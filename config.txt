@@ -1,0 +1,4 @@
+Please enter your p2pool address and VTC wallet address to store them:
+
+p2pool: "replace this text between the quotes"
+wallet: "replace this text between the quotes"
